@@ -1,0 +1,41 @@
+name: Automated Testing and Allure Report
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+
+    - name: Install Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.x
+
+    - name: Install Java
+      uses: actions/setup-java@v2
+      with:
+        java-version: '8'  
+        distribution: 'adopt'
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        playwright install
+
+    - name: Run Tests
+      run: pytest
+      continue-on-error: true
+
+    - name: Allure Report action from marketplace
+      uses: simple-elf/allure-report-action@master
+
+    - name: Deploy Allure to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.TOKEN }}
+        publish_dir: ./allure-report
