@@ -16,3 +16,33 @@ class Header(BasePage):
 
     def isOpened(self, selector: ElementHandle):
         return self.getStyle(selector) == "color: orange;"
+    
+    def ifHomeLinkIsOpened(self):
+        return self.isOpened(self.getElement(self.home_link))
+    
+    def ifUserIsLoggedIn(self):
+        return self.isVisible(self.getElement(self.logged_in_enscription))
+    
+    def openHome(self):
+        self.clickButton(self.getElement(self.home_link))
+
+    def openProducts(self):
+        self.clickButton(self.getElement(self.products_link))
+
+    def openCart(self):
+        self.clickButton(self.getElement(self.cart_link))
+
+    def openLogin(self):
+        self.clickButton(self.getElement(self.login_link))
+
+    def openTestCases(self):
+        self.clickButton(self.getElement(self.test_cases_link))
+
+    def openContactUs(self):
+        self.clickButton(self.getElement(self.concat_us_link))
+
+    def logout(self):
+        self.clickButton(self.getElement(self.logout_link))
+
+    def deleteAccount(self):
+        self.clickButton(self.getElement(self.delete_account_link))

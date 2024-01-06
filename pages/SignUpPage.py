@@ -1,5 +1,5 @@
 import random
-from playwright.sync_api import Page, ElementHandle
+from playwright.sync_api import Page
 from pages.Header import Header
 
 class SignUpPage(Header):
@@ -52,3 +52,81 @@ class SignUpPage(Header):
         self.selectText(self.getElement(self.day_signup_field), self.getText(selected_day))
         self.selectText(self.getElement(self.month_signup_field), self.getText(selected_month))
         self.selectText(self.getElement(self.year_signup_field), self.getText(selected_year))
+
+    def checkNewUserSignupEnscription(self):
+        return self.isVisible(self.getElement(self.new_user_signup_enscription))
+    
+    def checkLoginEnscription(self):
+        return self.isVisible(self.getElement(self.login_enscription))
+    
+    def fillEmailLoginField(self, value: str):
+        self.inputText(self.getElement(self.email_login_field), value)
+
+    def fillPasswordLoginField(self, value: str):
+        self.inputText(self.getElement(self.password_login_field), value)
+
+    def clickLoginButton(self):
+        self.clickButton(self.getElement(self.login_button))
+
+    def fillNameSignUpField(self, value: str):
+        self.inputText(self.getElement(self.name_signup_field), value)
+    
+    def fillEmailSignUpField(self, value: str):
+        self.inputText(self.getElement(self.email_signup_field), value)
+
+    def clickSignUpButton(self):
+        self.clickButton(self.getElement(self.signup_button))
+
+    def checkAccountInformationEnscription(self):
+        return self.isVisible(self.getElement(self.account_information_enscription))
+    
+    def chooseGender(self, option: bool):
+        self.clickButton(self.getElement(self.title_signup_field1 if option else self.title_signup_field2))
+
+    def fillPasswordSignUpField(self, value: str):
+        self.inputText(self.getElement(self.password_signup_field), value)
+
+    def checkNewsletterSignUp(self):
+        self.clickButton(self.getElement(self.newsletter_signup_check))
+
+    def checkOffersSignUp(self):
+        self.clickButton(self.getElement(self.offers_signup_check))
+    
+    def fillFirstNameSignUpField(self, value: str):
+        self.inputText(self.getElement(self.first_name_signup_field), value)
+
+    def fillLastNameSignUpField(self, value: str):
+        self.inputText(self.getElement(self.last_name_signup_field), value)
+    
+    def fillCompanySignUpField(self, value: str):
+        self.inputText(self.getElement(self.company_signup_field), value)
+
+    def fillAdress1SignUpField(self, value: str):
+        self.inputText(self.getElement(self.address1_signup_field), value)
+
+    def fillAdress2SignUpField(self, value: str):
+        self.inputText(self.getElement(self.address2_signup_field), value)
+
+    def fillStateSignUpField(self, value: str):
+        self.inputText(self.getElement(self.state_signup_field), value)
+
+    def fillCitySignUpField(self, value: str):
+        self.inputText(self.getElement(self.city_signup_field), value)
+
+    def fillZipcodeSignUpField(self, value: str):
+        self.inputText(self.getElement(self.zipcode_signup_field), value)
+    
+    def fillPhoneSignUpField(self, value: str):
+        self.inputText(self.getElement(self.phone_signup_field), value)
+
+    def clickCreateAccountButton(self):
+        self.clickButton(self.getElement(self.create_account_button))
+
+    def checkAccountCreatedEnscription(self):
+        return self.isVisible(self.getElement(self.account_created_enscription))
+    
+    def clickContinue(self):
+        self.clickButton(self.getElement(self.continue_button))
+
+    def getLoginError(self):
+        return self.getText(self.getElement(self.login_error))

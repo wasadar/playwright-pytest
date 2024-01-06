@@ -1,210 +1,137 @@
 import pytest
-import random
-import allure
-from faker import Faker
 from playwright.sync_api import Page
 from pages.HomePage import HomePage
 from pages.SignUpPage import SignUpPage
-
-fake = Faker()
+from helpers.fixtures import random_string_generator, random_mail_generator, \
+        random_address_generator, random_boolean_generator, random_city_generator, \
+        random_phone_generator, random_postcode_generator, random_state_generator, \
+        increment
+from helpers.repeating_steps import stepsFrom1to3, step4AccountTests, stepsFrom5to7SignUp, \
+    stepsFrom5to7Login, verifyLogin, deleteAccountAndVerifyDeletion
+from helpers.utils import screenshot
 
 @pytest.fixture
-def register_user(page):
+def registered_user(page, random_string_generator, random_mail_generator, random_address_generator, \
+    random_boolean_generator, random_city_generator, random_phone_generator, random_postcode_generator, random_state_generator):
     home = HomePage(page)
     sign_up = SignUpPage(page)
 
-    name = ''.join(fake.random_letters(6))
-    email = fake.email()
-    password = ''.join(fake.random_letters(6))
+    name = random_string_generator(6)
+    email = random_mail_generator()
+    password = random_string_generator(6)
 
     home.open()
-    home.clickButton(home.getElement(home.login_link))
-    sign_up.inputText(sign_up.getElement(sign_up.name_signup_field), name)
-    sign_up.inputText(sign_up.getElement(sign_up.email_signup_field), email)
-    sign_up.clickButton(sign_up.getElement(sign_up.signup_button))
-    sign_up.clickButton(sign_up.getElement(random.choice([sign_up.title_signup_field1, sign_up.title_signup_field2])))
-    sign_up.inputText(sign_up.getElement(sign_up.password_signup_field), password)
+    home.openLogin()
+    sign_up.fillNameSignUpField(name)
+    sign_up.fillEmailSignUpField(email)
+    sign_up.clickSignUpButton()
+    sign_up.chooseGender(random_boolean_generator())
+    sign_up.fillPasswordSignUpField(password)
     sign_up.fillDateOfBirth()
-    sign_up.clickButton(sign_up.getElement(sign_up.newsletter_signup_check))
-    sign_up.clickButton(sign_up.getElement(sign_up.offers_signup_check))
-    sign_up.inputText(sign_up.getElement(sign_up.first_name_signup_field), ''.join(fake.random_letters(6)))
-    sign_up.inputText(sign_up.getElement(sign_up.last_name_signup_field), ''.join(fake.random_letters(6)))
-    sign_up.inputText(sign_up.getElement(sign_up.company_signup_field), ''.join(fake.random_letters(6)))
-    sign_up.inputText(sign_up.getElement(sign_up.address1_signup_field), fake.address())
-    sign_up.inputText(sign_up.getElement(sign_up.address2_signup_field), fake.address())
+    sign_up.checkNewsletterSignUp()
+    sign_up.checkOffersSignUp()
+    sign_up.fillFirstNameSignUpField(random_string_generator(6))
+    sign_up.fillLastNameSignUpField(random_string_generator(6)) 
+    sign_up.fillCompanySignUpField(random_string_generator(6))
+    sign_up.fillAdress1SignUpField(random_address_generator())
+    sign_up.fillAdress2SignUpField(random_address_generator())
     sign_up.fillCountry()
-    sign_up.inputText(sign_up.getElement(sign_up.state_signup_field), fake.state())
-    sign_up.inputText(sign_up.getElement(sign_up.city_signup_field), fake.city())
-    sign_up.inputText(sign_up.getElement(sign_up.zipcode_signup_field), fake.postcode())
-    sign_up.inputText(sign_up.getElement(sign_up.phone_signup_field), fake.phone_number())
-    sign_up.clickButton(sign_up.getElement(sign_up.create_account_button))
-    sign_up.clickButton(sign_up.getElement(sign_up.continue_button))
-    home.clickButton(home.getElement(home.logout_link))
+    sign_up.fillStateSignUpField(random_state_generator())
+    sign_up.fillCitySignUpField(random_city_generator())
+    sign_up.fillZipcodeSignUpField(random_postcode_generator())
+    sign_up.fillPhoneSignUpField(random_phone_generator())
+    sign_up.clickCreateAccountButton()
+    sign_up.clickContinue()
+    home.logout()
 
     return {"username": name, "email": email, "password": password}
 
 
-def test_case_1(page: Page):
+def test_case_1(page: Page, random_string_generator, random_mail_generator, random_address_generator, \
+    random_boolean_generator, random_city_generator, random_phone_generator, random_postcode_generator, \
+    random_state_generator, increment):
     home = HomePage(page)
     sign_up = SignUpPage(page)
+    case = 1
     
-    home.open() # step 2
-    allure.attach( body=page.screenshot(full_page=True), name="case 1 step 2", attachment_type=allure.attachment_type.PNG)
-    practice_header = home.getElement(home.practice_header) # step 3
-    home_link = home.getElement(home.home_link)
-    assert home.isVisible(practice_header) and home.isOpened(home_link), "Home page is not visible"
-    allure.attach( body=page.screenshot(full_page=True), name="case 1 step 3", attachment_type=allure.attachment_type.PNG)
-    home.clickButton(home.getElement(home.login_link)) # step 4
-    allure.attach( body=page.screenshot(full_page=True), name="case 1 step 4", attachment_type=allure.attachment_type.PNG)
-    new_user_signup_enscription = sign_up.getElement(sign_up.new_user_signup_enscription) # step 5
-    assert sign_up.isVisible(new_user_signup_enscription), "No new user sign up enscription"
-    allure.attach( body=page.screenshot(full_page=True), name="case 1 step 5", attachment_type=allure.attachment_type.PNG)
-    sign_up.inputText(sign_up.getElement(sign_up.name_signup_field), ''.join(fake.random_letters(6))) # step 6
-    sign_up.inputText(sign_up.getElement(sign_up.email_signup_field), fake.email())
-    allure.attach( body=page.screenshot(full_page=True), name="case 1 step 6", attachment_type=allure.attachment_type.PNG)
-    sign_up.clickButton(sign_up.getElement(sign_up.signup_button)) # step 7
-    allure.attach( body=page.screenshot(full_page=True), name="case 1 step 7", attachment_type=allure.attachment_type.PNG)
-    account_information_enscription = sign_up.getElement(sign_up.account_information_enscription) # step 8
-    assert sign_up.isVisible(account_information_enscription), "Enter account information enscreption is not visible"
-    allure.attach( body=page.screenshot(full_page=True), name="case 1 step 8", attachment_type=allure.attachment_type.PNG)
-    sign_up.clickButton(sign_up.getElement(random.choice([sign_up.title_signup_field1,sign_up.title_signup_field2]))) # step 9
-    sign_up.inputText(sign_up.getElement(sign_up.password_signup_field), ''.join(fake.random_letters(6)))
+    stepsFrom1to3(page,case,increment) # steps 1 - 3
+    step4AccountTests(page,case,increment) # step 4
+    stepsFrom5to7SignUp(page,case,increment, random_string_generator(6), random_mail_generator()) # steps 5 - 7
+
+    assert sign_up.checkAccountInformationEnscription(), "Enter account information enscreption is not visible" # step 8
+    screenshot(page,case,increment())
+    sign_up.chooseGender(random_boolean_generator()) # step 9
+    sign_up.fillPasswordSignUpField(random_string_generator(6))
     sign_up.fillDateOfBirth()
-    allure.attach( body=page.screenshot(full_page=True), name="case 1 step 9", attachment_type=allure.attachment_type.PNG)
-    sign_up.clickButton(sign_up.getElement(sign_up.newsletter_signup_check)) # step 10
-    allure.attach( body=page.screenshot(full_page=True), name="case 1 step 10", attachment_type=allure.attachment_type.PNG)
-    sign_up.clickButton(sign_up.getElement(sign_up.offers_signup_check)) # step 11
-    allure.attach( body=page.screenshot(full_page=True), name="case 1 step 11", attachment_type=allure.attachment_type.PNG)
-    sign_up.inputText(sign_up.getElement(sign_up.first_name_signup_field), ''.join(fake.random_letters(6))) # step 12
-    sign_up.inputText(sign_up.getElement(sign_up.last_name_signup_field), ''.join(fake.random_letters(6))) 
-    sign_up.inputText(sign_up.getElement(sign_up.company_signup_field), ''.join(fake.random_letters(6)))
-    sign_up.inputText(sign_up.getElement(sign_up.address1_signup_field), fake.address())
-    sign_up.inputText(sign_up.getElement(sign_up.address2_signup_field), fake.address())
+    screenshot(page,case,increment())
+    sign_up.checkNewsletterSignUp() # step 10
+    screenshot(page,case,increment())
+    sign_up.checkOffersSignUp() # step 11
+    screenshot(page,case,increment())
+    sign_up.fillFirstNameSignUpField(random_string_generator(6)) # step 12
+    sign_up.fillLastNameSignUpField(random_string_generator(6)) 
+    sign_up.fillCompanySignUpField(random_string_generator(6))
+    sign_up.fillAdress1SignUpField(random_address_generator())
+    sign_up.fillAdress2SignUpField(random_address_generator())
     sign_up.fillCountry()
-    sign_up.inputText(sign_up.getElement(sign_up.state_signup_field), fake.state())
-    sign_up.inputText(sign_up.getElement(sign_up.city_signup_field), fake.city())
-    sign_up.inputText(sign_up.getElement(sign_up.zipcode_signup_field), fake.postcode())
-    sign_up.inputText(sign_up.getElement(sign_up.phone_signup_field), fake.phone_number())
-    allure.attach( body=page.screenshot(full_page=True), name="case 1 step 12", attachment_type=allure.attachment_type.PNG)
-    sign_up.clickButton(sign_up.getElement(sign_up.create_account_button)) # step 13
-    allure.attach( body=page.screenshot(full_page=True), name="case 1 step 13", attachment_type=allure.attachment_type.PNG)
-    account_created_enscription = sign_up.getElement(sign_up.account_created_enscription) #step 14
-    assert sign_up.isVisible(account_created_enscription)
-    allure.attach( body=page.screenshot(full_page=True), name="case 1 step 14", attachment_type=allure.attachment_type.PNG)
-    sign_up.clickButton(sign_up.getElement(sign_up.continue_button)) # step 15
-    allure.attach( body=page.screenshot(full_page=True), name="case 1 step 15", attachment_type=allure.attachment_type.PNG)
-    logged_in_enscription = home.getElement(home.logged_in_enscription) # step 16
-    assert home.isVisible(logged_in_enscription), "Logged in as enscription is not visible"
-    allure.attach( body=page.screenshot(full_page=True), name="case 1 step 16", attachment_type=allure.attachment_type.PNG)
-    home.clickButton(home.getElement(home.delete_account_link)) # step 17
-    allure.attach( body=page.screenshot(full_page=True), name="case 1 step 17", attachment_type=allure.attachment_type.PNG)
-    account_deleted_enscription = home.getElement(home.account_deleted_enscription) # step 18
-    assert home.isVisible(account_deleted_enscription), "Account deleted enscription is not visible"
-    allure.attach( body=page.screenshot(full_page=True), name="case 1 step 18", attachment_type=allure.attachment_type.PNG)
+    sign_up.fillStateSignUpField(random_state_generator())
+    sign_up.fillCitySignUpField(random_city_generator())
+    sign_up.fillZipcodeSignUpField(random_postcode_generator())
+    sign_up.fillPhoneSignUpField(random_phone_generator())
+    screenshot(page,case,increment())
+    sign_up.clickCreateAccountButton() # step 13
+    screenshot(page,case,increment())
+    assert sign_up.checkAccountCreatedEnscription() #step 14
+    screenshot(page,case,increment())
+    sign_up.clickContinue() # step 15
+    screenshot(page,case,increment())
 
-def test_case_2(page: Page, register_user):
+    verifyLogin(page,case,increment) # step 16
+    deleteAccountAndVerifyDeletion(page,case,increment) # steps 17 - 18
+
+def test_case_2(page: Page, registered_user, increment):
+    case = 2
+
+    stepsFrom1to3(page,case,increment) # steps 1 - 3
+    step4AccountTests(page,case,increment) # step 4
+    stepsFrom5to7Login(page,case,increment, registered_user['email'], registered_user['password']) # steps 5 - 7
+    verifyLogin(page,case,increment) # step 8
+    deleteAccountAndVerifyDeletion(page,case,increment) # steps 9 - 10
+
+def test_case_3(page: Page, registered_user, random_string_generator, increment):
+    sign_up = SignUpPage(page)
+    case = 3
+    
+    stepsFrom1to3(page,case,increment) # steps 1 - 3
+    step4AccountTests(page,case,increment) # step 4
+    stepsFrom5to7Login(page,case,increment, registered_user['email'], random_string_generator(5)) # steps 5 - 7
+
+    assert sign_up.getLoginError() == "Your email or password is incorrect!", "Error message is not shown or is wrong" # step 8
+    screenshot(page,case,increment()) 
+
+def test_case_4(page: Page, registered_user, increment):
     home = HomePage(page)
     sign_up = SignUpPage(page)
-    
-    home.open() # step 2
-    allure.attach( body=page.screenshot(full_page=True), name="case 2 step 2", attachment_type=allure.attachment_type.PNG)
-    practice_header = home.getElement(home.practice_header) # step 3
-    home_link = home.getElement(home.home_link)
-    assert home.isVisible(practice_header) and home.isOpened(home_link), "Home page is not visible"
-    allure.attach( body=page.screenshot(full_page=True), name="case 2 step 3", attachment_type=allure.attachment_type.PNG)
-    home.clickButton(home.getElement(home.login_link)) # step 4
-    allure.attach( body=page.screenshot(full_page=True), name="case 2 step 4", attachment_type=allure.attachment_type.PNG)
-    login_enscription = sign_up.getElement(sign_up.login_enscription) # step 5
-    assert sign_up.isVisible(login_enscription), "No login to your account enscription"
-    allure.attach( body=page.screenshot(full_page=True), name="case 2 step 5", attachment_type=allure.attachment_type.PNG)
-    sign_up.inputText(sign_up.getElement(sign_up.email_login_field), register_user["email"]) # step 6
-    sign_up.inputText(sign_up.getElement(sign_up.password_login_field), register_user["password"])
-    allure.attach( body=page.screenshot(full_page=True), name="case 2 step 6", attachment_type=allure.attachment_type.PNG)
-    sign_up.clickButton(sign_up.getElement(sign_up.login_button)) # step 7
-    allure.attach( body=page.screenshot(full_page=True), name="case 2 step 7", attachment_type=allure.attachment_type.PNG)
-    logged_in_enscription = home.getElement(home.logged_in_enscription) # step 8
-    assert home.isVisible(logged_in_enscription), "Logged in as enscription is not visible"
-    allure.attach( body=page.screenshot(full_page=True), name="case 2 step 8", attachment_type=allure.attachment_type.PNG)
-    home.clickButton(home.getElement(home.delete_account_link)) # step 9
-    allure.attach( body=page.screenshot(full_page=True), name="case 2 step 9", attachment_type=allure.attachment_type.PNG)
-    account_deleted_enscription = home.getElement(home.account_deleted_enscription) # step 10
-    assert home.isVisible(account_deleted_enscription), "Account deleted enscription is not visible"
-    allure.attach( body=page.screenshot(full_page=True), name="case 2 step 10", attachment_type=allure.attachment_type.PNG)
+    case = 4
 
-def test_case_3(page: Page, register_user):
-    home = HomePage(page)
-    sign_up = SignUpPage(page)
-    
-    home.open() # step 2
-    allure.attach( body=page.screenshot(full_page=True), name="case 3 step 2", attachment_type=allure.attachment_type.PNG)
-    practice_header = home.getElement(home.practice_header) # step 3
-    home_link = home.getElement(home.home_link)
-    assert home.isVisible(practice_header) and home.isOpened(home_link), "Home page is not visible"
-    allure.attach( body=page.screenshot(full_page=True), name="case 3 step 3", attachment_type=allure.attachment_type.PNG)
-    home.clickButton(home.getElement(home.login_link)) # step 4
-    allure.attach( body=page.screenshot(full_page=True), name="case 3 step 4", attachment_type=allure.attachment_type.PNG)
-    login_enscription = sign_up.getElement(sign_up.login_enscription) # step 5
-    assert sign_up.isVisible(login_enscription), "No login to your account enscription"
-    allure.attach( body=page.screenshot(full_page=True), name="case 3 step 5", attachment_type=allure.attachment_type.PNG)
-    sign_up.inputText(sign_up.getElement(sign_up.email_login_field), register_user["email"]) # step 6
-    sign_up.inputText(sign_up.getElement(sign_up.password_login_field), ''.join(fake.random_letters(5)))
-    allure.attach( body=page.screenshot(full_page=True), name="case 3 step 6", attachment_type=allure.attachment_type.PNG)
-    sign_up.clickButton(sign_up.getElement(sign_up.login_button)) # step 7
-    allure.attach( body=page.screenshot(full_page=True), name="case 3 step 7", attachment_type=allure.attachment_type.PNG)
-    error_message = sign_up.getElement(sign_up.login_error) # step 8
-    assert sign_up.getText(error_message) == "Your email or password is incorrect!", "Error message is not shown or is wrong"
-    allure.attach( body=page.screenshot(full_page=True), name="case 3 step 8", attachment_type=allure.attachment_type.PNG) 
+    stepsFrom1to3(page,case,increment) # steps 1 - 3
+    step4AccountTests(page,case,increment) # step 4
+    stepsFrom5to7Login(page,case,increment, registered_user['email'], registered_user['password']) # steps 5 - 7
+    verifyLogin(page,case,increment) # step 8
 
-def test_case_4(page: Page, register_user):
-    home = HomePage(page)
-    sign_up = SignUpPage(page)
+    home.logout() # step 9
+    screenshot(page,case,increment())
+    assert sign_up.checkLoginEnscription() and sign_up.checkNewUserSignupEnscription(), "User is not redirected to login page" # step 10
+    screenshot(page,case,increment())
     
-    home.open() # step 2
-    allure.attach( body=page.screenshot(full_page=True), name="case 4 step 2", attachment_type=allure.attachment_type.PNG) 
-    practice_header = home.getElement(home.practice_header) # step 3
-    home_link = home.getElement(home.home_link)
-    assert home.isVisible(practice_header) and home.isOpened(home_link), "Home page is not visible"
-    allure.attach( body=page.screenshot(full_page=True), name="case 4 step 2", attachment_type=allure.attachment_type.PNG) 
-    home.clickButton(home.getElement(home.login_link)) # step 4
-    allure.attach( body=page.screenshot(full_page=True), name="case 4 step 4", attachment_type=allure.attachment_type.PNG) 
-    login_enscription = sign_up.getElement(sign_up.login_enscription) # step 5
-    assert sign_up.isVisible(login_enscription), "No login to your account enscription"
-    allure.attach( body=page.screenshot(full_page=True), name="case 4 step 5", attachment_type=allure.attachment_type.PNG) 
-    sign_up.inputText(sign_up.getElement(sign_up.email_login_field), register_user["email"]) # step 6
-    sign_up.inputText(sign_up.getElement(sign_up.password_login_field), register_user["password"])
-    allure.attach( body=page.screenshot(full_page=True), name="case 4 step 6", attachment_type=allure.attachment_type.PNG) 
-    sign_up.clickButton(sign_up.getElement(sign_up.login_button)) # step 7
-    allure.attach( body=page.screenshot(full_page=True), name="case 4 step 7", attachment_type=allure.attachment_type.PNG) 
-    logged_in_enscription = home.getElement(home.logged_in_enscription) # step 8
-    assert home.isVisible(logged_in_enscription), "Logged in as enscription is not visible"
-    allure.attach( body=page.screenshot(full_page=True), name="case 4 step 8", attachment_type=allure.attachment_type.PNG) 
-    home.clickButton(home.getElement(home.logout_link)) # step 9
-    allure.attach( body=page.screenshot(full_page=True), name="case 4 step 9", attachment_type=allure.attachment_type.PNG) 
-    new_user_signup_enscription = sign_up.getElement(sign_up.new_user_signup_enscription) # step 10
-    login_enscription = sign_up.getElement(sign_up.login_enscription) 
-    assert sign_up.isVisible(new_user_signup_enscription) and sign_up.isVisible(login_enscription) , "User is not redirected to login page"
-    allure.attach( body=page.screenshot(full_page=True), name="case 4 step 10", attachment_type=allure.attachment_type.PNG) 
+def test_case_5(page: Page, registered_user, random_string_generator, increment):
+    sign_up = SignUpPage(page)
+    case = 5
+    
+    stepsFrom1to3(page,case,increment) # steps 1 - 3
+    step4AccountTests(page,case,increment) # step 4
+    screenshot(page,case,increment())
+    stepsFrom5to7SignUp(page,case,increment, random_string_generator(6), registered_user['email']) # steps 5 - 7
 
-def test_case_5(page: Page, register_user):
-    home = HomePage(page)
-    sign_up = SignUpPage(page)
-    
-    home.open() # step 2
-    allure.attach( body=page.screenshot(full_page=True), name="case 5 step 2", attachment_type=allure.attachment_type.PNG) 
-    practice_header = home.getElement(home.practice_header) # step 3
-    home_link = home.getElement(home.home_link)
-    assert home.isVisible(practice_header) and home.isOpened(home_link), "Home page is not visible"
-    allure.attach( body=page.screenshot(full_page=True), name="case 5 step 3", attachment_type=allure.attachment_type.PNG) 
-    home.clickButton(home.getElement(home.login_link)) # step 4
-    allure.attach( body=page.screenshot(full_page=True), name="case 5 step 4", attachment_type=allure.attachment_type.PNG) 
-    new_user_signup_enscription = sign_up.getElement(sign_up.new_user_signup_enscription) # step 5
-    assert sign_up.isVisible(new_user_signup_enscription), "No new user sign up enscription"
-    allure.attach( body=page.screenshot(full_page=True), name="case 5 step 5", attachment_type=allure.attachment_type.PNG) 
-    sign_up.inputText(sign_up.getElement(sign_up.name_signup_field), register_user["username"]) # step 6
-    sign_up.inputText(sign_up.getElement(sign_up.email_signup_field), register_user["email"])
-    allure.attach( body=page.screenshot(full_page=True), name="case 5 step 6", attachment_type=allure.attachment_type.PNG) 
-    sign_up.clickButton(sign_up.getElement(sign_up.signup_button)) # step 7
-    allure.attach( body=page.screenshot(full_page=True), name="case 5 step 7", attachment_type=allure.attachment_type.PNG) 
-    error_message = sign_up.getElement(sign_up.login_error) # step 8
-    assert sign_up.getText(error_message) == "Email Address already exist!", "Error message is not shown or is wrong"
-    allure.attach( body=page.screenshot(full_page=True), name="case 5 step 8", attachment_type=allure.attachment_type.PNG) 
+    assert sign_up.getLoginError() == "Email Address already exist!", "Error message is not shown or is wrong" # step 8
+    screenshot(page,case,increment()) 

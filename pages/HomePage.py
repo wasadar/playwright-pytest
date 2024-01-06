@@ -1,4 +1,4 @@
-from playwright.sync_api import Page, ElementHandle
+from playwright.sync_api import Page
 from pages.Header import Header
 
 class HomePage(Header):
@@ -11,3 +11,24 @@ class HomePage(Header):
         self.email_footer_field = "input[id=\"susbscribe_email\"]"
         self.arrow_button = "button.btn.btn-default[type=\"submit\"]"
         self.subscribe_message = "div.alert-success.alert"
+    
+    def checkPraticeHeader(self):
+        return self.isVisible(self.getElement(self.practice_header))
+    
+    def checkAccountDeletion(self):
+        return self.isVisible(self.getElement(self.account_deleted_enscription))
+    
+    def checkFooterEnscription(self):
+        return self.isVisible(self.getElement(self.footer_text))
+    
+    def clickContinue(self):
+        self.clickButton(self.getElement(self.continue_button))
+
+    def clickArrowButton(self):
+        self.clickButton(self.getElement(self.arrow_button))
+
+    def fillEmailFooterField(self, value: str):
+        self.inputText(self.getElement(self.email_footer_field), value)
+
+    def checkSubscribeMessage(self):
+        return self.getText(self.getElement(self.subscribe_message))
