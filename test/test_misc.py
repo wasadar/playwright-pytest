@@ -30,6 +30,7 @@ def test_case_6(page: Page, random_string_generator, random_mail_generator, rand
     screenshot(page,case,increment())
     contact.acceptDialogue() # step 9
     screenshot(page,case,increment())
+    contact.clickSubmitButton() # bug-fix for steps 8-9
     assert contact.checkSuccessMessage() == "Success! Your details have been submitted successfully.", "Success message is not shown or is wrong" # step 10
     screenshot(page,case,increment())
     contact.returnHome() # step 11

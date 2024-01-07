@@ -13,7 +13,7 @@ class ContactPage(Header):
         self.file_contact_field = "input[name=\"upload_file\"]"
         self.submit_button = "input[data-qa=\"submit-button\"]"
         self.success_message = "div.alert-success.alert"
-        self.home_button = "a.btn.btn-success[href=\"/\"][previewlistener=\"true\"]"
+        self.home_button = "a.btn.btn-success[href=\"/\"]"
 
     def checkGetInTouchEnscription(self):
         return self.isVisible(self.getElement(self.get_in_touch_enscription))
